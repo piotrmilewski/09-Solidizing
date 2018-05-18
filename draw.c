@@ -19,8 +19,112 @@
 
   Color should be set differently for each polygon.
   ====================*/
-void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb ) {
+void scanline_convert( struct matrix *points, int i, screen s, zbuffer zb, color c ) {
 
+  int top, mid, bot, y;
+  int distance0, distance1, distance2;
+  double x0, x1, y0, y1, y2, dx0, dx1, z0, z1, dz0, dz1;
+  int flip = 0;
+
+  z0 = z1 = dz0 = dz1 = 0;
+
+  //color
+  c.red = rand() % 255;
+  c.green = rand() % 255;
+  c.blue = rand() % 255;
+
+  y0 = points->m[1][i];
+  y1 = points->m[1][i+1];
+  y2 = points->m[1][i+2];
+
+  //determine bottom, middle, and top
+  if ( y0 <= y1 && y0 <= y2) {
+    bot = i;
+    if (y1 <= y2) {
+      mid = i+1;
+      top = i+2;
+    }
+    else {
+      mid = i+2;
+      top = i+1;
+    }
+  }
+  else if (y1 <= y0 && y1 <= y2) {
+    bot = i+1;
+    if (y0 <= y2) {
+      mid = i;
+      top = i+2;
+    }
+    else {
+      mid = i+2;
+      top = i;
+    }
+  }
+  else {
+    bot = i+2;
+    if (y0 <= y1) {
+      mid = i;
+      top = i+1;
+    }
+    else {
+      mid = i+1;
+      top = i;
+    }
+  }
+
+  x0 = points->m[0][bot];
+  x1 = points->m[0][bot];
+  z0 = points->m[2][bot];
+  z1 = points->m[2][bot];
+  y = (int)(points->m[1][bot]);
+
+  distance0 = (int)(points->m[1][top]) - y;
+  distance1 = (int)(points->m[1][mid]) - y;
+  distance2 = (int)(points->m[1][top]) - (int)(points->m[1][mid]);
+  
+  if (distance0 > 0) {
+    dx0 = (points->m[0][top] - points->m[0][bot])/distance0;
+    dz0 = (points->m[2][top] - points->m[2][bot])/distance0;
+  }
+  else{
+    dx0 = 0;
+    dz0 = 0;
+  }
+
+  if (distance1 > 0) {
+    dx1 = (points->m[0][mid]-points->m[0][bot])/distance1;
+    dz1 = (points->m[2][mid]-points->m[2][bot])/distance1;
+  }
+  else{
+    dx1 = 0;
+    dz1 = 0;
+  }  
+  
+  while ( y <= (int)points->m[1][top] ) {
+    
+    draw_line(x0, y, z0, x1, y, z1, s, zb, c);
+
+    x0+= dx0;
+    x1+= dx1;
+    z0+= dz0;
+    z1+= dz1;
+    y++;
+    
+    if ( !flip && y >= (int)(points->m[1][mid]) ) {
+      flip = 1;
+      
+      if (distance2 > 0) {
+	dx1 = (points->m[0][top]-points->m[0][mid])/distance2;
+	dz1 = (points->m[2][top]-points->m[2][mid])/distance2;
+      }
+      else{
+	dx1 = 0;
+	dz1 = 0;
+      }
+      x1 = points->m[0][mid];
+      z1 = points->m[2][mid];
+    }
+  }
 }
 
 /*======== void add_polygon() ==========
@@ -73,27 +177,7 @@ void draw_polygons(struct matrix *polygons, screen s, zbuffer zb, color c ) {
 
     if ( normal[2] > 0 ) {
 
-      draw_line( polygons->m[0][point],
-                 polygons->m[1][point],
-                 polygons->m[2][point],
-                 polygons->m[0][point+1],
-                 polygons->m[1][point+1],
-                 polygons->m[2][point+1],
-                 s, zb, c);
-      draw_line( polygons->m[0][point+2],
-                 polygons->m[1][point+2],
-                 polygons->m[2][point+2],
-                 polygons->m[0][point+1],
-                 polygons->m[1][point+1],
-                 polygons->m[2][point+1],
-                 s, zb, c);
-      draw_line( polygons->m[0][point],
-                 polygons->m[1][point],
-                 polygons->m[2][point],
-                 polygons->m[0][point+2],
-                 polygons->m[1][point+2],
-                 polygons->m[2][point+2],
-                 s, zb, c);
+      scanline_convert(polygons, point, s, zb, c);
     }
   }
 }

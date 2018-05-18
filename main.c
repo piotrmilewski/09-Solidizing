@@ -17,6 +17,8 @@ int main(int argc, char **argv) {
   struct matrix * polygons;
   struct matrix * transform;
 
+  clear_zbuffer(zb);
+  
   edges = new_matrix(4, 4);
   transform = new_matrix(4, 4);
   polygons = new_matrix(4, 4);

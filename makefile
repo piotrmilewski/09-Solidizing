@@ -31,4 +31,4 @@ run: all
 	./main script
 
 clean:
-	rm *.o *~
+	rm *.o *~ *.png main
