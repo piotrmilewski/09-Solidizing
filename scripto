@@ -1,0 +1,47 @@
+#CENTER AND ROTATE FOR POV
+push
+move
+250 250 0
+rotate
+x 30
+rotate
+y 45
+#main cube
+box
+0 0 0 100 100 100
+#RIGHT FACE
+push
+move
+100 0 0
+box
+0 0 0 120 70 10
+box
+50 -70 0 70 150 10
+box
+-100 -150 0 150 70 10
+pop
+#LEFT FACE
+push
+rotate
+y -90
+move
+-220 -150 0
+box
+0 0 0 210 70 10
+box
+0 150 0 70 150 10
+pop
+#TOP FACE
+push
+rotate
+x 90
+move
+0 -150 10
+box
+10 0 0 140 70 10
+box
+150 90 0 70 160 10
+pop
+display
+save
+runo.png

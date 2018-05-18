@@ -3,6 +3,9 @@ CFLAGS= -Wall
 LDFLAGS= -lm
 CC= gcc
 
+runo: all
+	./main scripto
+
 all: $(OBJECTS)
 	$(CC) -o main $(OBJECTS) $(LDFLAGS)
 
